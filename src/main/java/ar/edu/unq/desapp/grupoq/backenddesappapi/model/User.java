@@ -27,7 +27,7 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
     @Column(name = "cvu", nullable = false, length = 22, unique = true)
-    private String MercadoPagoCVU;
+    private String mercadoPagoCVU;
     @Column(name = "wallet", nullable = false, length = 8, unique = true)
     private String wallet;
 

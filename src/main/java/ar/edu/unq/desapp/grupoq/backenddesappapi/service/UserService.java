@@ -2,13 +2,15 @@ package ar.edu.unq.desapp.grupoq.backenddesappapi.service;
 
 import ar.edu.unq.desapp.grupoq.backenddesappapi.model.User;
 import ar.edu.unq.desapp.grupoq.backenddesappapi.persistance.UserRepository;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -20,31 +22,81 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private List<String> errors;
+    private Map<String, String> errors = new LinkedHashMap<>();
 
-    public String register(User user) {
-        if(validateEmail(user.getEmail())){
+    public Map<String, String> register(User user) {
+        if(areValidData(user)){
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(user);
-            return "Registered user successfully";
+            Map<String, String> info = new LinkedHashMap<>();
+            info.put("info", "Registered user successfully");
+            return info;
         }else {
-            return this.errors.get(0);
+            return this.errors;
         }
     }
 
-    public Boolean validateEmail(String email){
-        this.errors = new ArrayList<>();
+    public Boolean areValidData(User user) {
+        return validNameAndLastName(user.getName(), user.getLastname()) &&
+                validCVU(user.getMercadoPagoCVU()) &&
+                validWallet(user.getWallet()) &&
+                validateEmail(user.getEmail()) &&
+                validPassword(user.getPassword());
+    }
 
+    public Boolean validNameAndLastName(String name, String lastName) {
+        val isValidName = 3 <= name.length() && name.length() <= 30;
+        val isValidLastName = 3 <= lastName.length() && lastName.length() <= 30;
+        if (!isValidName) {
+            this.errors.put("error", "Name size must be between 3 and 30");
+        }
+        if (!isValidLastName) {
+            this.errors.put("error", "LastName size mut be between 3 and 30");
+        }
+        return isValidName && isValidLastName;
+    }
+
+
+    public Boolean validCVU(String cvu) {
+        val isValid = cvu.length() == 22;
+        if (!isValid) {
+            this.errors.put("error", "The MercadoPago cvu must contain 22 digits");
+        }
+        return isValid;
+    }
+
+    public Boolean validWallet(String wallet) {
+        val isValid = wallet.length() == 8;
+        val exist = this.userRepository.existsByWallet(wallet);
+        if (!isValid) {
+            this.errors.put("error", "The wallet must contain 8 digits");
+        } else if (exist) {
+            this.errors.put("error", "This wallet already exists");
+        }
+        return isValid && !exist;
+    }
+
+    public Boolean validPassword(String password) {
+        String passPattern = "^(?=.*\\d)(?=.*[\\u0021-\\u002b\\u003c-\\u0040])(?=.*[A-Z])(?=.*[a-z])\\S{8,16}$";
+        val isValid = password.matches(passPattern) && (!password.isEmpty() || !password.isBlank()) ;
+        if (!isValid) {
+            this.errors.put("error", "Invalid password");
+        }
+        return isValid;
+    }
+
+    public Boolean validateEmail(String email){
         Boolean existEmail = existEmail(email);
+        // expresion regular
         String emailPattern = "^[_a-z0-9-]+(\\.[_a-z0-9-]+)*@" +
                 "[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,4})$";
         Boolean validEmail = email.matches(emailPattern);
         Boolean emailNoIsEmpty = !email.isEmpty();
 
         if(!validEmail){
-            this.errors.add("Email invalid");
+            this.errors.put("error", "Email invalid");
         } else if(existEmail){
-            this.errors.add("Email already exists");
+            this.errors.put("error", "Email already exists");
         }
         return emailNoIsEmpty && validEmail && !existEmail;
     }
@@ -57,4 +109,11 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public Map<String, String> getErrors () {
+        return this.errors;
+    }
 }
