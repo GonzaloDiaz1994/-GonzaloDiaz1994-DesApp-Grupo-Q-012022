@@ -1,5 +1,7 @@
 package ar.edu.unq.desapp.grupoq.backenddesappapi.webservice;
 
+import ar.edu.unq.desapp.grupoq.backenddesappapi.dto.UserRegistryDTO;
+import ar.edu.unq.desapp.grupoq.backenddesappapi.mapper.UserMapper;
 import ar.edu.unq.desapp.grupoq.backenddesappapi.model.User;
 import ar.edu.unq.desapp.grupoq.backenddesappapi.security.jwt.JwtRequest;
 import ar.edu.unq.desapp.grupoq.backenddesappapi.security.jwt.JwtResponse;
@@ -44,7 +46,7 @@ public class AuthenticationController {
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authenticationRequest) throws Exception {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         val response =  new JwtResponse(token(user(authenticationRequest.getUsername())));
-        return new ResponseEntity(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     private UserDetails user(String userName){
@@ -65,7 +67,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@RequestBody User user) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody UserRegistryDTO userRegistryDTO) {
+        User user = UserMapper.mapUserRegistryDTOToUserModel(userRegistryDTO);
         val response = userService.register(user);
         if (userService.getErrors().isEmpty()) {
             return new ResponseEntity<>(response, HttpStatus.OK);

@@ -23,9 +23,10 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     private Map<String, String> errors = new LinkedHashMap<>();
+    private final String error = "ERROR";
 
     public Map<String, String> register(User user) {
-        if(areValidData(user)){
+        if(Boolean.TRUE.equals(this.areValidData(user))){
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(user);
             Map<String, String> info = new LinkedHashMap<>();
@@ -37,21 +38,21 @@ public class UserService {
     }
 
     public Boolean areValidData(User user) {
-        return validNameAndLastName(user.getName(), user.getLastname()) &&
-                validCVU(user.getMercadoPagoCVU()) &&
-                validWallet(user.getWallet()) &&
-                validateEmail(user.getEmail()) &&
-                validPassword(user.getPassword());
+        return this.validNameAndLastName(user.getName(), user.getLastname()) &&
+                this.validCVU(user.getMercadoPagoCVU()) &&
+                this.validWallet(user.getWallet()) &&
+                this.validateEmail(user.getEmail()) &&
+                this.validPassword(user.getPassword());
     }
 
     public Boolean validNameAndLastName(String name, String lastName) {
         val isValidName = 3 <= name.length() && name.length() <= 30;
         val isValidLastName = 3 <= lastName.length() && lastName.length() <= 30;
         if (!isValidName) {
-            this.errors.put("error", "Name size must be between 3 and 30");
+            this.errors.put(error, "Name size must be between 3 and 30");
         }
         if (!isValidLastName) {
-            this.errors.put("error", "LastName size mut be between 3 and 30");
+            this.errors.put(error, "LastName size mut be between 3 and 30");
         }
         return isValidName && isValidLastName;
     }
@@ -60,7 +61,7 @@ public class UserService {
     public Boolean validCVU(String cvu) {
         val isValid = cvu.length() == 22;
         if (!isValid) {
-            this.errors.put("error", "The MercadoPago cvu must contain 22 digits");
+            this.errors.put(error, "The MercadoPago cvu must contain 22 digits");
         }
         return isValid;
     }
@@ -69,9 +70,9 @@ public class UserService {
         val isValid = wallet.length() == 8;
         val exist = this.userRepository.existsByWallet(wallet);
         if (!isValid) {
-            this.errors.put("error", "The wallet must contain 8 digits");
+            this.errors.put(error, "The wallet must contain 8 digits");
         } else if (exist) {
-            this.errors.put("error", "This wallet already exists");
+            this.errors.put(error, "This wallet already exists");
         }
         return isValid && !exist;
     }
@@ -80,7 +81,7 @@ public class UserService {
         String passPattern = "^(?=.*\\d)(?=.*[\\u0021-\\u002b\\u003c-\\u0040])(?=.*[A-Z])(?=.*[a-z])\\S{8,16}$";
         val isValid = password.matches(passPattern) && (!password.isEmpty() || !password.isBlank()) ;
         if (!isValid) {
-            this.errors.put("error", "Invalid password");
+            this.errors.put(error, "Invalid password");
         }
         return isValid;
     }
@@ -88,15 +89,14 @@ public class UserService {
     public Boolean validateEmail(String email){
         Boolean existEmail = existEmail(email);
         // expresion regular
-        String emailPattern = "^[_a-z0-9-]+(\\.[_a-z0-9-]+)*@" +
-                "[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,4})$";
+        String emailPattern = "^[_a-z0-9-]+(\\.[_a-z0-9-]+)*@[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,4})$";
         Boolean validEmail = email.matches(emailPattern);
         Boolean emailNoIsEmpty = !email.isEmpty();
 
-        if(!validEmail){
-            this.errors.put("error", "Email invalid");
-        } else if(existEmail){
-            this.errors.put("error", "Email already exists");
+        if(Boolean.FALSE.equals(!validEmail)){
+            this.errors.put(error, "Email invalid");
+        } else if(Boolean.TRUE.equals(existEmail)){
+            this.errors.put(error, "Email already exists");
         }
         return emailNoIsEmpty && validEmail && !existEmail;
     }

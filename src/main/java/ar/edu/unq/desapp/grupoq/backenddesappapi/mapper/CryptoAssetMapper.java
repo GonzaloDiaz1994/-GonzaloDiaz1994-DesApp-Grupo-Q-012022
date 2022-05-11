@@ -7,6 +7,10 @@ import java.util.Date;
 
 public class CryptoAssetMapper {
 
+    private CryptoAssetMapper() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static CryptoAssetDTO mapModelToDTO(CryptoAsset cryptoAsset) {
         String date = new Date(System.currentTimeMillis()).toString();
         return CryptoAssetDTO.builder()

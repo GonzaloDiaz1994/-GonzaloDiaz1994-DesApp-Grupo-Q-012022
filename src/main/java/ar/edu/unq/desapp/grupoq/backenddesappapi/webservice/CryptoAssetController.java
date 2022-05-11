@@ -16,7 +16,7 @@ public class CryptoAssetController {
     CryptoAssetService cryptoAssetService;
 
     @GetMapping("/crypto-asset")
-    public ResponseEntity<?> getCryptoAsset(@RequestParam String symbol) {
+    public ResponseEntity<CryptoAssetDTO> getCryptoAsset(@RequestParam String symbol) {
         CryptoAssetDTO cryptoAssetDTO = CryptoAssetMapper
                 .mapModelToDTO(cryptoAssetService.getPriceFromCryptoAsset(symbol));
         return new ResponseEntity<>(cryptoAssetDTO, HttpStatus.OK);

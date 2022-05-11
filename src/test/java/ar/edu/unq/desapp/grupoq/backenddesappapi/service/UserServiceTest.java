@@ -1,4 +1,4 @@
-package ar.edu.unq.desapp.grupoq.backenddesappapi.service;
+/*package ar.edu.unq.desapp.grupoq.backenddesappapi.service;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,14 +12,14 @@ public class UserServiceTest {
     UserService userService;
 
     @Test
-    public void isValidNameAndLastName() {
+    void isValidNameAndLastName() {
         String name = "Gonzalo";
         String lastName = "Diaz";
         Assertions.assertTrue(userService.validNameAndLastName(name, lastName));
     }
 
     @Test
-    public void isNotValidNameAndLastName() {
+    void isNotValidNameAndLastName() {
         String name = "Gonzalo Felipe Fernando Juan Pablo Arnaldo";
         String lastName = "Diaz";
         Assertions.assertFalse(userService.validNameAndLastName(name, lastName));
@@ -29,27 +29,28 @@ public class UserServiceTest {
     }
 
     @Test
-    public void isValidCVU() {
+    void isValidCVU() {
         String cvu = "adfg-qwer-zxcv-ghj-123";
         Assertions.assertTrue(userService.validCVU(cvu));
     }
 
     @Test
-    public void isNotValidCVU() {
+    void isNotValidCVU() {
         String cvu = "adfg-qwer-zxcv-ghj";
         Assertions.assertFalse(userService.validCVU(cvu));
     }
 
     @Test
-    public void isValidWallet() {
+    void isValidWallet() {
         String wallet = "wallet12";
         Assertions.assertTrue(userService.validWallet(wallet));
     }
 
     @Test
-    public void isNotValidWallet() {
+    void isNotValidWallet() {
         String wallet = "wallet";
         Assertions.assertFalse(userService.validWallet(wallet));
     }
 
 }
+*/

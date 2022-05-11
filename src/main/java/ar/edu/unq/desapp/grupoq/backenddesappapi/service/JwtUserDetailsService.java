@@ -19,7 +19,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        if (userService.existEmail(email)) {
+        if (Boolean.TRUE.equals(userService.existEmail(email))) {
             ar.edu.unq.desapp.grupoq.backenddesappapi.model.User  persistedUser = userService.findByEmail(email);
 
             return new User(persistedUser.getEmail(), persistedUser.getPassword(), new ArrayList<>());
